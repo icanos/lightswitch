@@ -11,7 +11,9 @@ class Schemas:
 		self.schemas = []
 
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('schemas')
+		self.logger.addHandler(fileLog)
 
 		# define lexing conditions
 		self.defineConditionSyntax()

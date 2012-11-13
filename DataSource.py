@@ -8,7 +8,9 @@ class DataSources:
 		self.sources = []
 
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('devices')
+		self.logger.addHandler(fileLog)
 		self.logLevel = logLevel
 
 	def load(self):
@@ -62,7 +64,9 @@ class DataSource:
 		self.previous_value = -10000.0
 
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('device')
+		self.logger.addHandler(fileLog)
 
 	def execute(self):
 		self.seconds_elapsed += 1

@@ -6,7 +6,9 @@ class Devices:
 		self.devices = []
 
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('devices')
+		self.logger.addHandler(fileLog)
 
 	def load(self, telldus):
 		from Telldus import Telldus

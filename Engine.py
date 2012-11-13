@@ -24,7 +24,9 @@ class Engine:
 
 		# logging
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('engine')
+		self.logger.addHandler(fileLog)
 
 	def run(self):
 		self.logger.info('running on %s platform', platform.system())

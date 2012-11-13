@@ -79,7 +79,8 @@ class Telldus:
 			except WindowsError:
 				raise Exception('Telldus Core was not found, are you sure it is installed?')
 		else:
-			self.tdlib = cdll.LoadLibrary('telldus-core.so.6')
+			from ctypes import cdll
+			self.tdlib = cdll.LoadLibrary('/usr/local/lib/libtelldus-core.so')
 
 		if self.tdlib is None:
 			raise Exception('No Telldus Core library was found')
@@ -87,7 +88,9 @@ class Telldus:
 		self.tdlib.tdInit()
 
 		logging.basicConfig(level=logLevel)
+		fileLog = logging.FileHandler('/var/log/lightswitch.log')
 		self.logger = logging.getLogger('telldus')
+		self.logger.addHandler(fileLog)
 
 	def getNumberOfDevices(self):
 		return self.tdlib.tdGetNumberOfDevices()
