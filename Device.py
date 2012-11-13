@@ -1,5 +1,5 @@
 import ConfigParser, os, sys
-import logging
+import logging, platform
 
 class Devices:
 	def __init__(self, logLevel):
@@ -11,7 +11,10 @@ class Devices:
 	def load(self, telldus):
 		from Telldus import Telldus
 
-		devicepath = os.path.dirname(sys.argv[0]) + "\config\devices.cfg"
+		if platform.system() == 'Linux':
+			devicepath = os.path.dirname(sys.argv[0]) + "/config/devices.cfg"
+		else:
+			devicepath = os.path.dirname(sys.argv[0]) + "\config\devices.cfg"
 
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(devicepath))
@@ -62,7 +65,7 @@ class Device:
 		return self.id
 
 	def getName(self):
-		return self.name
+		return str(self.name)
 
 	def getProtocol(self):
 		return self.protocol

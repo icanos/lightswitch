@@ -1,7 +1,7 @@
 # TODO: Create a schema class and populate (like Devices and DataSources)
 
 import ConfigParser, os, sys
-import logging
+import logging, platform
 from datetime import datetime, timedelta
 from pyparsing import Word, nums, alphanums, alphas, oneOf, Group, Combine, Optional
 import re
@@ -17,7 +17,10 @@ class Schemas:
 		self.defineConditionSyntax()
 
 	def load(self):
-		schemapath = os.path.dirname(sys.argv[0]) + "\config\schemas.cfg"
+		if platform.system() == 'Linux':
+			schemapath = os.path.dirname(sys.argv[0]) + "/config/schemas.cfg"
+		else:
+			schemapath = os.path.dirname(sys.argv[0]) + "\config\schemas.cfg"
 
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(schemapath))
@@ -66,6 +69,9 @@ class Schemas:
 		condition = schema.getCondition()
 		parser = self.defineConditionSyntax()
 
+		if len(condition) == 0:
+			return True
+
 		p = re.compile(r'( and | or )')
 		ands = p.split(condition)
 
@@ -111,6 +117,7 @@ class Schema:
 		self.days = []
 		self.condition = ""
 		self.devices = ""
+		self.level = 0
 
 	def getId(self):
 		return self.id
@@ -132,6 +139,12 @@ class Schema:
 
 	def getDevices(self):
 		return self.devices
+
+	def getLevel(self):
+		return int((float(self.level) / float(100)) * float(254))
+
+	def getProcentualLevel(self):
+		return self.level
 
 	def parse(self, schema):
 		if 'name' in schema.keys():
@@ -159,3 +172,5 @@ class Schema:
 		if 'devices' in schema.keys():
 			self.devices = schema['devices']
 
+		if 'level' in schema.keys():
+			self.level = int(schema['level'])

@@ -92,9 +92,16 @@ class Engine:
 			if schema.getPower() == 'on':
 				self.logger.info('turning on device')
 				self.telldus.turnOn(device.getTelldusId())
+				time.sleep(1)
+				self.telldus.turnOn(device.getTelldusId())
+			elif schema.getPower() == 'dim':
+				self.logger.info('dimming device to level %d', schema.getProcentualLevel())
+				self.telldus.dim(device.getTelldusId(), schema.getLevel())
 			else:
 				self.logger.info('turning off device')
 				self.telldus.turnOff(device.getTelldusId())
+
+			time.sleep(1)
 
 	def updateTelldusWithDevices(self):
 		self.logger.debug('removing devices from telldus')
@@ -104,7 +111,7 @@ class Engine:
 		for device in self.devices:
 			self.logger.debug('adding device %s to telldus', device.getName())
 
-			tdevice = self.telldus.addDevice()
+			tdevice = self.telldus.addDevice(len(self.devices))
 			tdevice.setName(device.getName())
 			tdevice.setProtocol(device.getProtocol())
 			tdevice.setModel(device.getModel())

@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import ConfigParser, os, sys
-import logging, json
+import logging, json, platform
 from urllib import urlopen
 
 class DataSources:
@@ -12,7 +12,10 @@ class DataSources:
 		self.logLevel = logLevel
 
 	def load(self):
-		datasourcepath = os.path.dirname(sys.argv[0]) + "\config\datasources.cfg"
+		if platform.system() == 'Linux':
+			datasourcepath = os.path.dirname(sys.argv[0]) + "/config/datasources.cfg"
+		else:
+			datasourcepath = os.path.dirname(sys.argv[0]) + "\config\datasources.cfg"
 
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(datasourcepath))
