@@ -51,6 +51,8 @@ class Engine:
 				self.updateTelldusWithDevices()
 
 		self.logger.info('running application')
+		self.startUp()
+
 		# lightswitch main loop
 		while True:
 			for schema in self.schemas:
@@ -71,14 +73,53 @@ class Engine:
 					self.logger.info('executing schema %s', schema.getName())
 					self.execute(schema)
 
-					if 'start' in self.executedDates.keys():
-						self.executedDates['start'].append(now)
-					else:
-						self.executedDates['start'] = [now]
+			if 'start' in self.executedDates.keys():
+				self.executedDates['start'].append(now)
+			else:
+				self.executedDates['start'] = [now]
 
 			time.sleep(1)
 
 		self.telldus.close()
+
+	def startUp(self):
+		power = {}
+		self.logger.debug('synchronizing devices')
+
+		for schema in self.schemas:
+			startDate = self.schemaParser.getStartDate(schema)
+			now = datetime.today().replace(second=0, microsecond=0)
+			weekday = datetime.today().weekday()
+
+			if startDate is not None and\
+					startDate < now and\
+					weekday in schema.getDays() and\
+					self.schemaParser.tryCondition(self.dataSourceParser, schema):
+
+				self.logger.info('adding schema %s to execution', schema.getName())
+				
+				for device in schema.getDevices().split(','):
+					if schema.getPower() == 'dim':
+						power[int(device)] = schema.getPower() + ":" + str(schema.getLevel())
+					else:
+						power[int(device)] = schema.getPower()
+
+		for device in power.keys():
+			if power[device] == 'on':
+				self.logger.info('turning on device')
+				dev = self.deviceParser.findDevice(device)
+				self.telldus.turnOn(dev.getTelldusId())
+				self.telldus.turnOn(dev.getTelldusId())
+			elif power[device] == 'off':
+				self.logger.info('turning off device')
+				dev = self.deviceParser.findDevice(device)
+				self.telldus.turnOff(dev.getTelldusId())
+				self.telldus.turnOff(dev.getTelldusId())
+			elif power[device][0:3] == 'dim':
+				dev = self.deviceParser.findDevice(device)
+				self.logger.info('dimming device to level %d', int(power[device][4:]))
+				self.telldus.dim(dev.getTelldusId(), int(power[device][4:]))
+				#self.telldus.dim(dev.getTelldusId(), int((float(power[device][4:]) / float(100)) * float(254)))
 
 	def execute(self, schema):
 		for id in schema.getDevices().split(','):
@@ -100,8 +141,9 @@ class Engine:
 			else:
 				self.logger.info('turning off device')
 				self.telldus.turnOff(device.getTelldusId())
+				self.telldus.turnOff(device.getTelldusId())
 
-			time.sleep(1)
+			#time.sleep(1)
 
 	def updateTelldusWithDevices(self):
 		self.logger.debug('removing devices from telldus')
