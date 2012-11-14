@@ -1,11 +1,13 @@
 import logging
 import time
 import platform, sys
+import threading
 from Settings import Settings
 from Schema import Schemas
 from Device import Devices, Device
 from DataSource import DataSources, DataSource
 from Telldus import Telldus
+from Web import Web
 from datetime import datetime
 
 class Engine:
@@ -22,6 +24,8 @@ class Engine:
 		self.deviceParser = Devices(logLevel)
 		self.schemaParser = Schemas(logLevel)
 		self.dataSourceParser = DataSources(logLevel)
+		self.webServer = None
+		self.webThread = None
 
 		# logging
 		logging.basicConfig(level=logLevel)
@@ -44,6 +48,11 @@ class Engine:
 		self.logger.info('loading datasources')
 		self.datasources = self.dataSourceParser.load()
 
+		# starting web service
+		self.logger.info('starting web service on port 8080')
+		self.webThread = threading.Thread(target = self.startWebService)
+		self.webThread.start()
+
 		if len(self.devices) != self.telldus.getNumberOfDevices():
 			if not overwriteTelldus:
 				self.logger.info('number of devices in lightswitch differs from telldus. run with -o to overwrite telldus.')
@@ -57,33 +66,42 @@ class Engine:
 		self.startUp()
 
 		# lightswitch main loop
-		while True:
-			for schema in self.schemas:
-				startDate = self.schemaParser.getStartDate(schema)
-				now = datetime.today().replace(second=0, microsecond=0)
-				weekday = datetime.today().weekday()
+		try:
+			while True:
+				for schema in self.schemas:
+					startDate = self.schemaParser.getStartDate(schema)
+					now = datetime.today().replace(second=0, microsecond=0)
+					weekday = datetime.today().weekday()
 
-				# check if its a start of a schedule
-				if (startDate is not None and\
-						now == startDate and\
-						weekday in schema.getDays() and\
-						now not in self.executedDates['start'] and\
-						self.schemaParser.tryCondition(self.dataSourceParser, schema)\
-					) or (\
-						startDate is None and self.schemaParser.tryCondition(self.dataSourceParser, schema) and\
-						now not in self.executedDates['start']):
+					# check if its a start of a schedule
+					if (startDate is not None and\
+							now == startDate and\
+							weekday in schema.getDays() and\
+							now not in self.executedDates['start'] and\
+							self.schemaParser.tryCondition(self.dataSourceParser, schema)\
+						) or (\
+							startDate is None and self.schemaParser.tryCondition(self.dataSourceParser, schema) and\
+							now not in self.executedDates['start']):
 
-					self.logger.info('executing schema %s', schema.getName())
-					self.execute(schema)
+						self.logger.info('executing schema %s', schema.getName())
+						self.execute(schema)
 
-			if 'start' in self.executedDates.keys():
-				self.executedDates['start'].append(now)
-			else:
-				self.executedDates['start'] = [now]
+				if 'start' in self.executedDates.keys():
+					self.executedDates['start'].append(now)
+				else:
+					self.executedDates['start'] = [now]
 
-			time.sleep(1)
-
+				time.sleep(1)
+		except KeyboardInterrupt:
+			pass
+		
+		#self.webThread.join()
+		self.webThread._Thread__stop()
 		self.telldus.close()
+		sys.exit(3)
+
+	def startWebService(self):
+		self.webServer = Web()
 
 	def startUp(self):
 		power = {}

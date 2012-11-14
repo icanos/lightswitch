@@ -2,7 +2,8 @@
 import platform
 
 class Settings:
-	loggingPath = ""
+	loggingPath 		= ""
+	webPort 			= 8080
 
 # Specify the logging path
 if platform.system() in ['Darwin', 'Linux']:
