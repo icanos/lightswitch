@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import ConfigParser, os, sys
 import logging, json, platform
+from Settings import Settings
 from urllib import urlopen
 
 class DataSources:
@@ -8,7 +9,7 @@ class DataSources:
 		self.sources = []
 
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('devices')
 		self.logger.addHandler(fileLog)
 		self.logLevel = logLevel
@@ -64,7 +65,7 @@ class DataSource:
 		self.previous_value = -10000.0
 
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('device')
 		self.logger.addHandler(fileLog)
 

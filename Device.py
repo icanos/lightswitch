@@ -1,12 +1,13 @@
 import ConfigParser, os, sys
 import logging, platform
+from Settings import Settings
 
 class Devices:
 	def __init__(self, logLevel):
 		self.devices = []
 
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('devices')
 		self.logger.addHandler(fileLog)
 

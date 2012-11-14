@@ -2,6 +2,7 @@
 
 import ConfigParser, os, sys
 import logging, platform
+from Settings import Settings
 from datetime import datetime, timedelta
 from pyparsing import Word, nums, alphanums, alphas, oneOf, Group, Combine, Optional
 import re
@@ -11,7 +12,7 @@ class Schemas:
 		self.schemas = []
 
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('schemas')
 		self.logger.addHandler(fileLog)
 

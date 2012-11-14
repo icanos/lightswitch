@@ -1,5 +1,6 @@
 import logging
 import platform
+from Settings import Settings
 from ctypes import c_int, c_ubyte, c_void_p, c_char_p, POINTER, string_at
 
 #Device methods
@@ -88,7 +89,7 @@ class Telldus:
 		self.tdlib.tdInit()
 
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('telldus')
 		self.logger.addHandler(fileLog)
 

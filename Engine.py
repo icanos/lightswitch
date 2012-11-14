@@ -1,6 +1,7 @@
 import logging
 import time
 import platform, sys
+from Settings import Settings
 from Schema import Schemas
 from Device import Devices, Device
 from DataSource import DataSources, DataSource
@@ -24,7 +25,7 @@ class Engine:
 
 		# logging
 		logging.basicConfig(level=logLevel)
-		fileLog = logging.FileHandler('/var/log/lightswitch.log')
+		fileLog = logging.FileHandler(Settings.loggingPath)
 		self.logger = logging.getLogger('engine')
 		self.logger.addHandler(fileLog)
 
@@ -107,18 +108,20 @@ class Engine:
 						power[int(device)] = schema.getPower()
 
 		for device in power.keys():
+			dev = self.deviceParser.findDevice(device)
+
+			if dev is None:
+				self.logger.info('no device with id %d was found', device)
+				continue
+
 			if power[device] == 'on':
 				self.logger.info('turning on device')
-				dev = self.deviceParser.findDevice(device)
 				self.telldus.turnOn(dev.getTelldusId())
 				self.telldus.turnOn(dev.getTelldusId())
 			elif power[device] == 'off':
 				self.logger.info('turning off device')
-				dev = self.deviceParser.findDevice(device)
-				self.telldus.turnOff(dev.getTelldusId())
 				self.telldus.turnOff(dev.getTelldusId())
 			elif power[device][0:3] == 'dim':
-				dev = self.deviceParser.findDevice(device)
 				self.logger.info('dimming device to level %d', int(power[device][4:]))
 				self.telldus.dim(dev.getTelldusId(), int(power[device][4:]))
 				#self.telldus.dim(dev.getTelldusId(), int((float(power[device][4:]) / float(100)) * float(254)))
