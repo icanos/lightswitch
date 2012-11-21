@@ -5,6 +5,12 @@ from Settings import Settings
 class Devices:
 	def __init__(self, logLevel):
 		self.devices = []
+		self.configParser = None
+		self.telldus = None
+		self.devicePath = ""
+
+		self.protocols = { 'Nexa': 'arctech', 'GAO': 'risingsun', 'Waveman': 'waveman', 'Elro': 'sartano', 'HomeEasy': 'arctech', 'Intertechno': 'arctech', 'Kjell och Company': 'risingsun', 'KlikAndKlikUit': 'arctech', 'Chacon': 'arctech', 'Proove': 'arctech', 'Sartano': 'sartano', 'CoCo': 'arctech', 'Roxcore': 'brateck', 'Ikea': 'ikea', 'HQ': 'fuhaote', 'Conrad': 'risingsun', 'Kappa': 'arctech', 'UPM': 'upm', 'X10': 'x10', 'Otio': 'risingsun', 'Ecosavers': 'silvanchip', 'Brennenstuhl': 'sartano', 'Hasta': 'hasta' }
+		self.types = { 'SelfLearningOnOff': 'selflearning-switch', 'SelfLearningDimmer': 'selflearning-dimmer', 'CodeSwitch': 'codeswitch', 'Bell': 'bell' }
 
 		logging.basicConfig(level=logLevel)
 		fileLog = logging.FileHandler(Settings.loggingPath)
@@ -14,20 +20,23 @@ class Devices:
 	def load(self, telldus):
 		from Telldus import Telldus
 
+		self.telldus = telldus
+		self.devices = []
+
 		if platform.system() == 'Linux':
-			devicepath = os.path.dirname(sys.argv[0]) + "/config/devices.cfg"
+			self.devicePath = os.path.dirname(sys.argv[0]) + "/config/devices.cfg"
 		else:
-			devicepath = os.path.dirname(sys.argv[0]) + "\config\devices.cfg"
+			self.devicePath = os.path.dirname(sys.argv[0]) + "\config\devices.cfg"
 
-		config = ConfigParser.ConfigParser()
-		config.readfp(open(devicepath))
+		self.configParser = ConfigParser.ConfigParser()
+		self.configParser.readfp(open(self.devicePath))
 
-		nos = len(config.sections())
+		nos = len(self.configParser.sections())
 		
 		if nos > 0:
 			device = {}
 			for i in range(1, nos + 1):
-				for item in config.items('device_' + str(i)):
+				for item in self.configParser.items('device_' + str(i)):
 					device[item[0]] = item[1]
 
 				# try to find the device in Telldus Core based on device name
@@ -53,6 +62,56 @@ class Devices:
 				return device
 
 		return None
+
+	def addDevice(self, name, model, type, house, unit, sunrise, sunset):
+		config = self.configParser
+
+		if sunrise is None or len(sunrise) == 0:
+			sunrise = "off"
+
+		if sunset is None or len(sunset) == 0:
+			sunset = "off"
+
+		protocol = self.protocols[model]
+		unitModel = self.types[type] + ':'
+
+		# TODO: Ugly! Fix this later on
+		if type == 'Kjell och Company':
+			unitModel += 'kjelloco'
+		else:
+			unitModel += model.lower()
+
+		sectionName = 'device_' + str(len(self.devices) + 1)
+		config.add_section(sectionName)
+		config.set(sectionName, 'name', name)
+		config.set(sectionName, 'protocol', protocol)
+		config.set(sectionName, 'model', unitModel)
+		config.set(sectionName, 'house', house)
+		config.set(sectionName, 'unit', unit)
+		config.set(sectionName, 'sunrise', sunrise)
+		config.set(sectionName, 'sunset', sunset)
+
+		with open(self.devicePath, 'wb') as configfile:
+			config.write(configfile)
+
+		device = self.telldus.addDevice()
+		device.setName(str(name))
+		device.setProtocol(protocol)
+		device.setModel(model)
+
+	def removeDevice(self, id):
+		config = self.configParser
+
+		sectionName = 'device_' + id
+		config.remove_section(sectionName)
+
+		with open(self.devicePath, 'wb') as configfile:
+			config.write(configfile)
+
+		device = self.findDevice(int(id))
+
+		#if device is not None:
+		self.telldus.removeDevice(device.getTelldusId())
 
 class Device:
 	def __init__(self, id, tid, telldus):

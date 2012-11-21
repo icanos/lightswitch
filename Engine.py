@@ -33,9 +33,7 @@ class Engine:
 		self.logger = logging.getLogger('engine')
 		self.logger.addHandler(fileLog)
 
-	def run(self):
-		self.logger.info('running on %s platform', platform.system())
-
+	def load(self):
 		# load schemas
 		self.logger.info('loading schemas')
 		self.schemas = self.schemaParser.load()
@@ -56,14 +54,18 @@ class Engine:
 		if len(self.devices) != self.telldus.getNumberOfDevices():
 			if not overwriteTelldus:
 				self.logger.info('number of devices in lightswitch differs from telldus. run with -o to overwrite telldus.')
-				self.telldus.close()
-				exit(1)
+				#self.telldus.close()
+				#exit(1)
 			else:
 				self.logger.info('replacing devices in telldus with devices from lightswitch.')
 				self.updateTelldusWithDevices()
 
-		self.logger.info('running application')
 		self.startUp()
+
+	def run(self):
+		self.logger.info('running on %s platform', platform.system())
+
+		self.logger.info('running application')
 
 		# lightswitch main loop
 		try:
@@ -101,7 +103,7 @@ class Engine:
 		sys.exit(3)
 
 	def startWebService(self):
-		self.webServer = Web(self.telldus, self.schemas, self.devices, self.datasources)
+		self.webServer = Web(self, self.deviceParser, self.schemaParser)
 
 	def startUp(self):
 		power = {}
@@ -199,4 +201,5 @@ for arg in sys.argv:
 		overwriteTelldus = True
 
 engine = Engine(logLevel, overwriteTelldus)
+engine.load()
 engine.run()

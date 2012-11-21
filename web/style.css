@@ -106,3 +106,13 @@ a:hover {
     color: #D8000C;
     background-color: #FFBABA;
 }
+
+#add-form input, select {
+	width: 100%;
+	border: 1px solid #ccc;
+	padding: 6px;
+}
+
+#add-form td {
+	padding-bottom: 5px;
+}

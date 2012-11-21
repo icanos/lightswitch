@@ -202,7 +202,7 @@ class Telldus:
 	def addDevice(self):
 		self.logger.debug('creating new device')
 		from Device import Device
-		return Device(self.tdlib.tdAddDevice(), self)
+		return Device(0, self.tdlib.tdAddDevice(), self)
 
 	def removeDevice(self, id):
 		self.logger.debug('removing device %d', id)

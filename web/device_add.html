@@ -1,0 +1,90 @@
+<h2 style="margin-top: 0; padding-top: 0;">New device</h2>
+
+<form action="/devices/save" method="post" name="device-form">
+<table id="add-form" cellspacing="0" cellpadding="0" width="30%">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Name</td>
+		<td><input type="text" name="name" value="" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Device</td>
+		<td>
+			<select name="model">
+				<option value="Brennenstuhl">Brennenstuhl</option>
+				<option value="Bye Bye Standby">Bye Bye Standby</option>
+				<option value="Chacon">Chacon</option>
+				<option value="CoCo">CoCo</option>
+				<option value="Conrad">Conrad</option>
+				<option value="Ecosavers">Ecosavers</option>
+				<option value="Elro">Elro</option>
+				<option value="GAO">GAO</option>
+				<option value="Goobay">Goobay</option>
+				<option value="Hasta">Hasta</option>
+				<option value="HomeEasy">HomeEasy</option>
+				<option value="HQ">HQ</option>
+				<option value="Ikea">Ikea</option>
+				<option value="Intertechno">Intertechno</option>
+				<option value="Kappa">Kappa</option>
+				<option value="Kjell och Company">Kjell och Company</option>
+				<option value="KlikAndKlikUit">KlikAndKlikUit</option>
+				<option value="Nexa">Nexa</option>
+				<option value="Otio">Otio</option>
+				<option value="Proove">Proove</option>
+				<option value="Roxcore">Roxcore</option>
+				<option value="Rusta">Rusta</option>
+				<option value="Sartano">Sartano</option>
+				<option value="UPM">UPM</option>
+				<option value="Waveman">Waveman</option>
+				<option value="X10">X10</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Device Type</td>
+		<td>
+			<select name="type">
+				<option value="Bell">Bell</option>
+				<option value="CodeSwitch">Code Switch</option>
+				<option value="SelfLearningDimmer">Self Learning Dimmer</option>
+				<option value="SelfLearningOnOff">Self Learning On/Off</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Remote Control</td>
+		<td><input type="text" name="remote_control_code" value="" style="width: 30%;" /></td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Unit Code</td>
+		<td><input type="text" name="unit_code" value="" style="width: 30%;" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Sunrise</td>
+		<td><input type="checkbox" name="sunrise" value="on" style="border: 0; width: auto;" /> Turn on</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Sunset</td>
+		<td><input type="checkbox" name="sunset" value="on" style="border: 0; width: auto;" /> Turn off</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input type="submit" name="save" value="Save" /></td>
+	</tr>
+</table>
+</form>
