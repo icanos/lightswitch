@@ -373,7 +373,7 @@ class Web:
 
 	@route('/power/on/:id')
 	def powerOn(id):
-		Web.instance.engine.telldus.turnOn(id)
+		Web.instance.engine.telldus.turnOn(int(id))
 
 		device = None
 		for dev in Web.instance.engine.devices:
@@ -391,7 +391,7 @@ class Web:
 
 	@route('/power/off/:id')
 	def powerOff(id):
-		Web.instance.engine.telldus.turnOff(id)
+		Web.instance.engine.telldus.turnOff(int(id))
 
 		device = None
 		for dev in Web.instance.engine.devices:
