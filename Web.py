@@ -18,7 +18,7 @@ class Web:
 		self.datasources = datasources
 		self.telldus = telldus
 
-		self.statusMessage = "Test"
+		self.statusMessage = ''
 
 		# set singleton instance
 		Web.instance = self

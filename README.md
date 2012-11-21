@@ -24,8 +24,12 @@ Installation:
  	python /path/to/Engine.py -o
 
  Configuration:
+  You can either use the configuration files or use the web interface that's provided as well.
+  The web interface uses the port 8080 as default (can be changed in Settings.py), so navigate to:
+  http://127.0.0.1:8080/ or http://<device IP>:8080/ to configure the system.
+
   Please refer to the examples in devices.cfg, schemas.cfg and datasources.cfg
-  in the config/ directory.
+  in the config/ directory if you want to edit the config files directly.
 
 
  PLEASE REPORT ANY BUGS OR FEATURE REQUESTS TO THE 'ISSUES' PAGE, THANK YOU!
