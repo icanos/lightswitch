@@ -377,7 +377,7 @@ class Web:
 
 		device = None
 		for dev in Web.instance.engine.devices:
-			if dev.getTelldusId() == id:
+			if dev.getTelldusId() == int(id):
 				device = dev
 				break
 
@@ -395,7 +395,7 @@ class Web:
 
 		device = None
 		for dev in Web.instance.engine.devices:
-			if dev.getTelldusId() == id:
+			if dev.getTelldusId() == int(id):
 				device = dev
 				break
 
