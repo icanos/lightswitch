@@ -185,7 +185,7 @@ class Web:
 			if elem[0:7] == 'device_':
 				Web.instance.engine.deviceParser.removeDevice(request.forms[elem])
 
-		Web.instance.statusMessage = '<div class="success">Successfully removed selected devices.</div>'
+		Web.instance.statusMessage = '<div class="success">Successfully removed the selected devices.</div>'
 
 		# reload all configuration
 		Web.instance.engine.load()
@@ -234,6 +234,136 @@ class Web:
 		content = content.replace('#SCHEMAS#', schemas)
 
 		return Web.instance.header() + content + Web.instance.footer()
+
+	@route('/schemas/add')
+	def schema_add():
+		content = open(Web.instance.webdir + '/schema_add.html', 'r').read()
+
+		devices = ''
+		for device in Web.instance.engine.devices:
+			devices += '<input type="checkbox" name="device_' + str(device.getId()) + '" value="' + str(device.getId()) + '" style="width: auto; border: 0;" /> ' + device.getName() + ' <small><span style="color: #ccc;">' + device.getType() + '</span></small><br />'
+
+		content = content.replace("#DEVICES#", devices)
+
+		content = content.replace('#STATUSMESSAGE#', Web.instance.statusMessage)
+		Web.instance.statusMessage = ''
+
+		return Web.instance.header() + content + Web.instance.footer()
+
+	@route('/schemas/edit/:id')
+	def schema_edit(id):
+		content = open(Web.instance.webdir + '/schema_edit.html', 'r').read()
+
+		schema = Web.instance.engine.schemaParser.findSchema(int(id))
+
+		if schema is None:
+			Web.instance.statusMessage = '<div class="error">Unable to find a schema with id ' + id + '.</div>'
+			redirect('/schemas')
+			return
+
+		content = content.replace("#ID#", str(schema.getId()))
+		content = content.replace('#NAME#', str(schema.getName()))
+
+		timeParts = schema.getTime().split(':')
+		hour = timeParts[0]
+		minute = timeParts[1]
+
+		content = content.replace("#HOUR#", hour)
+		content = content.replace("#MINUTE#", minute)
+
+		# Devices
+
+		deviceList = schema.getDevices().split(',')
+		devices = ''
+		for device in Web.instance.engine.devices:
+			if str(device.getId()) in deviceList:
+				devices += '<input type="checkbox" name="device_' + str(device.getId()) + '" value="' + str(device.getId()) + '" checked="checked" style="width: auto; border: 0;" /> ' + device.getName() + '<br />'
+			else:
+				devices += '<input type="checkbox" name="device_' + str(device.getId()) + '" value="' + str(device.getId()) + '" style="width: auto; border: 0;" /> ' + device.getName() + '<br />'
+
+		content = content.replace("#DEVICES#", devices)
+
+		# Days
+
+		if 0 in schema.getDays():
+			content = content.replace("#MOCHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 1 in schema.getDays():
+			content = content.replace("#TUCHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 2 in schema.getDays():
+			content = content.replace("#WECHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 3 in schema.getDays():
+			content = content.replace("#THCHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 4 in schema.getDays():
+			content = content.replace("#FRCHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 5 in schema.getDays():
+			content = content.replace("#SACHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+		if 6 in schema.getDays():
+			content = content.replace("#SUCHECKED#", 'checked="checked"')
+		else:
+			content = content.replace("#MOCHECKED#", '')
+
+		content = content.replace('#STATUSMESSAGE#', Web.instance.statusMessage)
+		Web.instance.statusMessage = ''
+
+		return Web.instance.header() + content + Web.instance.footer()
+
+	@route('/schemas/save', method = 'POST')
+	def schema_save():
+		devices = ''
+		for k in request.forms.keys():
+			if k[0:7] == 'device_':
+				id = request.forms[k]
+				devices += id + ','
+
+		devices = devices[0:len(devices) - 1]
+
+		days = ''
+		for k in request.forms.keys():
+			if k[0:8] == 'weekday_':
+				id = request.forms[k]
+				days += id + ','
+
+		days = days[0:len(days) - 1]
+
+		time = str(request.forms.hour) + ':' + str(request.forms.minute)
+
+		if request.forms.action_type == 'add':
+			Web.instance.engine.schemaParser.addSchema(request.forms.name, devices, request.forms.power, time, days)
+		else:
+			# update the information
+			Web.instance.engine.schemaParser.editSchema(request.forms.id, request.forms.name, devices, request.forms.power, time, days)
+
+		Web.instance.statusMessage = '<div class="success">Successfully added a schema with name ' + request.forms.name + '.</div>'
+
+		# reload all configuration
+		Web.instance.engine.load()
+
+		redirect('/schemas')
+
+	@route('/schemas/remove', method = 'POST')
+	def schema_remove():
+		for elem in request.forms.keys():
+			if elem[0:7] == 'schema_':
+				Web.instance.engine.schemaParser.removeSchema(request.forms[elem])
+
+		Web.instance.statusMessage = '<div class="success">Successfully removed the selected schemas.</div>'
+
+		# reload all configuration
+		Web.instance.engine.load()
+
+		redirect('/schemas')
 
 	# =========================================================================================
 	#

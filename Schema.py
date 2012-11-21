@@ -10,6 +10,8 @@ import re
 class Schemas:
 	def __init__(self, logLevel):
 		self.schemas = []
+		self.schemaPath = ''
+		self.configParser = None
 
 		logging.basicConfig(level=logLevel)
 		fileLog = logging.FileHandler(Settings.loggingPath)
@@ -21,21 +23,21 @@ class Schemas:
 
 	def load(self):
 		if platform.system() == 'Linux':
-			schemapath = os.path.dirname(sys.argv[0]) + "/config/schemas.cfg"
+			self.schemaPath = os.path.dirname(sys.argv[0]) + "/config/schemas.cfg"
 		else:
-			schemapath = os.path.dirname(sys.argv[0]) + "\config\schemas.cfg"
+			self.schemaPath = os.path.dirname(sys.argv[0]) + "\config\schemas.cfg"
 
 		self.schemas = []
 
-		config = ConfigParser.ConfigParser()
-		config.readfp(open(schemapath))
+		self.configParser = ConfigParser.ConfigParser()
+		self.configParser.readfp(open(self.schemaPath))
 
-		nos = len(config.sections())
+		nos = len(self.configParser.sections())
 		
 		if nos > 0:
 			for i in range(1, nos + 1):
 				schema = {}
-				for item in config.items('schema_' + str(i)):
+				for item in self.configParser.items('schema_' + str(i)):
 					schema[item[0]] = item[1]
 
 				sobj = Schema(i)
@@ -111,7 +113,48 @@ class Schemas:
 
 		return result
 
+	def findSchema(self, id):
+		for schema in self.schemas:
+			if schema.getId() == id:
+				return schema
 
+		return None
+
+	def addSchema(self, name, devices, power, executionTime, days):
+		config = self.configParser
+
+		sectionName = 'schema_' + str(len(self.schemas) + 1)
+		config.add_section(sectionName)
+		config.set(sectionName, 'name', name)
+		config.set(sectionName, 'devices', devices)
+		config.set(sectionName, 'power', power)
+		config.set(sectionName, 'time', executionTime)
+		config.set(sectionName, 'days', days)
+
+		with open(self.schemaPath, 'wb') as configfile:
+			config.write(configfile)
+
+	def editSchema(self, id, name, devices, power, executionTime, days):
+		config = self.configParser
+
+		sectionName = 'schema_' + str(id)
+		config.set(sectionName, 'name', name)
+		config.set(sectionName, 'devices', devices)
+		config.set(sectionName, 'power', power)
+		config.set(sectionName, 'time', executionTime)
+		config.set(sectionName, 'days', days)
+
+		with open(self.schemaPath, 'wb') as configfile:
+			config.write(configfile)
+
+	def removeSchema(self, id):
+		config = self.configParser
+
+		sectionName = 'schema_' + str(id)
+		config.remove_section(sectionName)
+
+		with open(self.schemaPath, 'wb') as configfile:
+			config.write(configfile)
 
 class Schema:
 	def __init__(self, id):
@@ -179,6 +222,8 @@ class Schema:
 
 			for day in days:
 				self.days += [int(day.strip())]
+
+			days.sort()
 
 		if 'condition' in schema.keys():
 			self.condition = schema['condition']

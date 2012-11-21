@@ -11,7 +11,7 @@ from Web import Web
 from datetime import datetime
 
 class Engine:
-	VERSION = '0.0.1'
+	VERSION = '0.0.5'
 	running = True
 
 	def __init__(self, logLevel, overwriteTelldus):

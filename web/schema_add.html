@@ -1,0 +1,76 @@
+<div id="nav">
+	<ul>
+		<li><a href="/index">Home</a></li>
+		<li>- <a href="/schemas">Schemas</a></li>
+		<li>- <a href="/schemas/add">New schema</a></li>
+	</ul>
+</div>
+
+#STATUSMESSAGE#
+
+<h2 style="margin-top: 0; padding-top: 0;">New schema</h2>
+
+<form action="/schemas/save" method="post" name="device-form">
+<input type="hidden" name="action_type" value="add" />
+<table id="add-form" cellspacing="0" cellpadding="0" width="30%">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Name</td>
+		<td><input type="text" name="name" value="" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;" valign="top">Devices</td>
+		<td>
+			#DEVICES#
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Power</td>
+		<td>
+			<select name="power">
+				<option value="on">Turn on</option>
+				<option value="off">Turn off</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;">Execution Time</td>
+		<td><input type="text" name="hour" value="12" style="float: left; width: 20px;" /><div style="float: left; width: 14px; margin-left: 10px;"> : </div><input type="text" name="minute" value="00" style="float: left; width: 20px;" /></td>
+	</tr>
+	<tr>
+		<td style="width: 150px; text-align: right; padding-right: 20px;" valign="top">Days</td>
+		<td>
+			<input type="checkbox" name="weekday_0" value="0" style="width: auto; border: 0;" /> Monday<br />
+			<input type="checkbox" name="weekday_1" value="1" style="width: auto; border: 0;" /> Tuesday<br />
+			<input type="checkbox" name="weekday_2" value="2" style="width: auto; border: 0;" /> Wednesday<br />
+			<input type="checkbox" name="weekday_3" value="3" style="width: auto; border: 0;" /> Thursday<br />
+			<input type="checkbox" name="weekday_4" value="4" style="width: auto; border: 0;" /> Friday<br />
+			<input type="checkbox" name="weekday_5" value="5" style="width: auto; border: 0;" /> Saturday<br />
+			<input type="checkbox" name="weekday_6" value="6" style="width: auto; border: 0;" /> Sunday<br />
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input type="submit" name="save" value="Save" /></td>
+	</tr>
+</table>
+</form>
