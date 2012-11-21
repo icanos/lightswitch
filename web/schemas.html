@@ -16,27 +16,29 @@ function handleAllRows()
 <div id="nav">
 	<ul>
 		<li><a href="/index">Home</a></li>
-		<li>- <a href="/devices">Devices</a></li>
+		<li>- <a href="/schemas">Schemas</a></li>
 	</ul>
 </div>
 
-<form name="deviceForm" method="post" action="/devices/remove">
+<form name="deviceForm" method="post" action="/schemas/remove">
 
 #STATUSMESSAGE#
 
-<input type="button" name="add_device" value="Add new device" class="submenu-button" onclick="document.location = '/devices/add';" />
+<input type="button" name="add_device" value="Add new device" class="submenu-button" onclick="document.location = '/schemas/add';" />
 
 <div class="info" style="width: 100%;">
-	<div class="info-title" style="width: 98.8%;">Your devices</div>
+	<div class="info-title" style="width: 98.8%;">Your schemas</div>
 	<table cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 			<th><input type="checkbox" name="checkall" id="checkall" value="true" onclick="handleAllRows();" /></th>
-			<th>Device</th>
-			<th>Status</th>
-			<th>Type</th>
-			<th>Action</th>
+			<th style="width: 350px;">Schema</th>
+			<th style="width: 150px;">Power</th>
+			<th style="width: 150px;">Number of devices</th>
+			<th>Execution Time</th>
+			<th>Days</th>
+			<th>Has conditions</th>
 		</tr>
-		#DEVICES#
+		#SCHEMAS#
 	</table>
 </div>
 

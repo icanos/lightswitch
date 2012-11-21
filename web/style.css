@@ -25,7 +25,7 @@ a:hover {
 #menu {
 	height: 30px;
 	width: 100%;
-	margin-bottom: 50px;
+	/*margin-bottom: 50px;*/
 	background-color: #1B56E0;
 	color: #fff;
 	float: left;
@@ -86,8 +86,10 @@ a:hover {
 
 .information, .success, .warning, .error, .validation {
     border: 1px solid;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding:7px 7px 7px 7px;
+    float: left;
+    width: 98%;
 }
 .information {
     color: #00529B;
@@ -115,4 +117,22 @@ a:hover {
 
 #add-form td {
 	padding-bottom: 5px;
+}
+
+#nav {
+	float: left;
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+#nav ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#nav ul li {
+	float: left;
+	margin-left: 5px;
 }

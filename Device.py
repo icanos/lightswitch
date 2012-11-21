@@ -99,6 +99,36 @@ class Devices:
 		device.setProtocol(protocol)
 		device.setModel(model)
 
+	def editDevice(self, id, name, model, type, house, unit, sunrise, sunset):
+		config = self.configParser
+
+		if sunrise is None or len(sunrise) == 0:
+			sunrise = "off"
+
+		if sunset is None or len(sunset) == 0:
+			sunset = "off"
+
+		protocol = self.protocols[model]
+		unitModel = self.types[type] + ':'
+
+		# TODO: Ugly! Fix this later on
+		if type == 'Kjell och Company':
+			unitModel += 'kjelloco'
+		else:
+			unitModel += model.lower()
+
+		sectionName = 'device_' + str(id)
+		config.set(sectionName, 'name', name)
+		config.set(sectionName, 'protocol', protocol)
+		config.set(sectionName, 'model', unitModel)
+		config.set(sectionName, 'house', house)
+		config.set(sectionName, 'unit', unit)
+		config.set(sectionName, 'sunrise', sunrise)
+		config.set(sectionName, 'sunset', sunset)
+
+		with open(self.devicePath, 'wb') as configfile:
+			config.write(configfile)
+
 	def removeDevice(self, id):
 		config = self.configParser
 
@@ -113,6 +143,26 @@ class Devices:
 		#if device is not None:
 		self.telldus.removeDevice(device.getTelldusId())
 
+	def getDeviceManufacturerByModel(self, model):
+		colonPos = model.index(':')
+		deviceType = model[colonPos + 1:]
+
+		for p in self.protocols.keys():
+			if p.lower() == deviceType:
+				return p
+
+		return None
+
+	def getDeviceTypeByModel(self, model):
+		colonPos = model.index(':')
+		deviceType = model[0:colonPos]
+
+		for t in self.types.keys():
+			if self.types[t] == deviceType:
+				return t
+
+		return None
+
 class Device:
 	def __init__(self, id, tid, telldus):
 		self.id = int(id)
@@ -125,6 +175,59 @@ class Device:
 		self.sunrise = False
 		self.sunset = False
 		self.status = "Unknown"
+
+		self.protocols = {'codeswitch:nexa':'Code Switch Nexa',\
+						'selflearning-switch:nexa':'Self Learning On/Off Nexa',\
+						'selflearning-dimmer:nexa':'Self Learning Dimmer Nexa',\
+						'bell:nexa':'Bell Nexa',\
+						'codeswitch:gao':'Code Switch GAO',\
+						'codeswitch:waveman':'Code Switch Waveman',\
+						'codeswitch:elro':'Code Switch Elro',\
+						'codeswitch:homeeasy':'Code Switch HomeEasy',\
+						'selflearning-dimmer:homeeasy':'Self Learning Dimmer HomeEasy',\
+						'codeswitch:homeeasy':'Code Switch Intertechno',\
+						'codeswitch:kjelloco':'Code Switch Kjell o Company',\
+						'codeswitch:klikaanklikuit':'Code Switch KlikAndKlikUit',\
+						'selflearning-switch:klikaanklikuit':'Self Learning On/Off KlikAndKlikUit',\
+						'selflearning-dimmer:klikaanklikuit':'Self Learning Dimmer KlikAndKlikUit',\
+						'bell:klikaanklikuit':'Bell KlikAndKlikUit',\
+						'codeswitch:chacon':'Code Switch Chacon',\
+						'selflearning-switch:chacon':'Self Learning On/Off Chacon',\
+						'selflearning-dimmer:chacon':'Self Learning Dimmer Chacon',\
+						'bell:chacon':'Bell Chacon',\
+						'codeswitch:proove':'Code Switch Proove',\
+						'selflearning-switch:proove':'Self Learning On/Off Proove',\
+						'selflearning-dimmer:proove':'Self Learning Dimmer Proove',\
+						'bell:proove':'Bell Proove',\
+						'codeswitch:sartano':'Code Switch Sartano',\
+						'codeswitch:coco':'Code Switch CoCo',\
+						'selflearning-switch:coco':'Self Learning On/Off CoCo',\
+						'selflearning-dimmer:coco':'Self Learning Dimmer CoCo',\
+						'bell:coco':'Bell CoCo',\
+						'codeswitch:roxcore':'Code Switch Roxcore',\
+						'selflearning:ikea':'Self Learning Dimmer Ikea',\
+						'codeswitch:fuhaote':'Code Switch HQ',\
+						'selflearning:conrad':'Self Learning On/Off Conrad',\
+						'selflearning-switch:gao':'Self Learning On/Off GAO',\
+						'selflearning-switch:homeeasy':'Self Learning On/Off HomeEasy',\
+						'codeswitch:kappa':'Code Switch Kappa',\
+						'selflearning-switch:kappa':'Self Learning On/Off Kappa',\
+						'selflearning-dimmer:kappa':'Self Learning Dimmer Kappa',\
+						'bell:kappa':'Bell Kappa',\
+						'codeswitch:rusta':'Code Switch Rusta',\
+						'selflearning-dimmer:rusta':'Self Learning Dimmer Rusta',\
+						'selflearning:upm':'Self Learning On/Off UPM',\
+						'codeSwitch:x10':'Code Switch X10',\
+						'selflearning-switch:intertechno':'Self Learning On/Off Intertechno',\
+						'selflearning-dimmer:intertechno':'Self Learning Dimmer Intertechno',\
+						'bell:intertechno':'Bell Intertechno',\
+						'codeswitch:elro-ab600':'Code Switch Elro',\
+						'codeswitch:byebyestandby':'Code Switch Bye Bye Standby',\
+						'goobay:goobay':'Code Switch Goobay',\
+						'selflearning:otio':'Self Learning On/Off Otio',\
+						'ecosavers:ecosavers':'Self Learning On/Off Ecosavers',\
+						'codeswitch:brennenstuhl':'Code Switch Brennenstuhl',\
+						'selflearning:hasta':'Self Learning On/Off Hasta'}
 
 		self.telldus = telldus
 
@@ -150,12 +253,13 @@ class Device:
 		return self.unit
 
 	def getType(self):
-		if self.model == 'selflearning-switch:nexa':
-			return "Self-Learning Nexa Switch"
+		return self.protocols[self.model]
 
-		# TODO: Add more devices
+	def getSunrise(self):
+		return self.sunrise
 
-		return "Unknown"
+	def getSunset(self):
+		return self.sunset
 
 	def getStatus(self):
 		return self.status

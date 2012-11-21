@@ -25,6 +25,8 @@ class Schemas:
 		else:
 			schemapath = os.path.dirname(sys.argv[0]) + "\config\schemas.cfg"
 
+		self.schemas = []
+
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(schemapath))
 
@@ -136,6 +138,15 @@ class Schema:
 
 	def getDays(self):
 		return self.days
+
+	def getDaysString(self):
+		dayStr = { 0: 'mo', 1: 'tu', 2: 'we', 3: 'th', 4: 'fr', 5: 'sa', 6: 'su' }
+		days = ''
+
+		for d in self.days:
+			days += dayStr[d] + ", "
+
+		return days[0:len(days) - 2]
 
 	def getCondition(self):
 		return self.condition

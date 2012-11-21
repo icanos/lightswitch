@@ -21,6 +21,8 @@ class DataSources:
 		else:
 			datasourcepath = os.path.dirname(sys.argv[0]) + "\config\datasources.cfg"
 
+		self.sources = []
+
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(datasourcepath))
 

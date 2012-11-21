@@ -42,7 +42,7 @@ class Web:
 
 		devices = ''
 		for device in Web.instance.engine.devices:
-			devices += "<tr><td style=\"padding-left: 10px;\">" + device.getName() + "</td><td>" + "Unknown" + "</td></tr>"
+			devices += "<tr><td style=\"padding-left: 10px;\">" + device.getName() + "</td><td>" + device.getStatus() + "</td></tr>"
 
 		content = content.replace('#DEVICES#', devices)
 
@@ -64,6 +64,12 @@ class Web:
 
 		return Web.instance.header() + content + Web.instance.footer()
 
+	# =========================================================================================
+	#
+	#  Service routes
+	#
+	# =========================================================================================
+
 	@route('/service/stop')
 	def service_stop():
 		# Stopping the service and exiting the application
@@ -84,14 +90,20 @@ class Web:
 		content = open(Settings.loggingPath, 'r').read()
 		return '<pre>' + content + '</pre>'
 
+	# =========================================================================================
+	#
+	#  Device routes
+	#
+	# =========================================================================================
+
 	@route('/devices')
 	def devices():
 		content = open(Web.instance.webdir + '/devices.html', 'r').read()
 
 		devices = ''
 		for device in Web.instance.engine.devices:
-			devices += '<tr><td style="padding-left: 10px; width: 20px;"><input type="checkbox" name="device_' + str(device.getId()) + '" value="' + str(device.getId()) + '" /></td><td>'\
-					+ device.getName() + '</td><td>' + device.getStatus() + '</td><td>' + device.getType() + '</td>\
+			devices += '<tr><td style="padding-left: 10px; width: 20px;"><input type="checkbox" name="device_' + str(device.getId()) + '" value="' + str(device.getId()) + '" /></td><td><a href="/devices/edit/' + str(device.getId()) + '">'\
+					+ device.getName() + '</a></td><td>' + device.getStatus() + '</td><td>' + device.getType() + '</td>\
 						<td><a href="/power/on/' + str(device.getTelldusId()) + '">Turn on</a> | <a href="/power/off/' + str(device.getTelldusId()) + '">Turn off</a></td></tr>'
 
 		content = content.replace('#DEVICES#', devices)
@@ -108,9 +120,58 @@ class Web:
 
 		return Web.instance.header() + content + Web.instance.footer()
 
+	@route('/devices/edit/:id')
+	def device_edit(id):
+		content = open(Web.instance.webdir + '/device_edit.html', 'r').read()
+
+		device = Web.instance.engine.deviceParser.findDevice(int(id))
+
+		if device is None:
+			Web.instance.statusMessage = '<div class="error">Unable to find a device with id ' + id + '.</div>'
+			redirect('/devices')
+			return
+
+		content = content.replace("#ID#", str(device.getId()))
+		content = content.replace('#NAME#', str(device.getName()))
+		content = content.replace('#REMOTECONTROL#', device.getHouse())
+		content = content.replace('#UNIT#', device.getUnit())
+
+		if device.getSunrise() == True:
+			content = content.replace("#CHECKEDSUNRISE#", 'checked="checked"')
+		else:
+			content = content.replace("#CHECKEDSUNRISE#", "")
+
+		if device.getSunset() == True:
+			content = content.replace("#CHECKEDSUNSET#", 'checked="checked"')
+		else:
+			content = content.replace("#CHECKEDSUNSET#", "")
+
+		deviceModel = Web.instance.engine.deviceParser.getDeviceManufacturerByModel(str(device.getModel()))
+		content = content.replace("#MODEL#", deviceModel)
+
+		deviceType = Web.instance.engine.deviceParser.getDeviceTypeByModel(str(device.getModel()))
+		if deviceType == 'SelfLearningOnOff':
+			deviceTypeNiceName = 'Self Learning On/Off'
+		elif deviceType == 'SelfLearningDimmer':
+			deviceTypeNiceName = 'Self Learning Dimmer'
+		elif deviceType == 'CodeSwitch':
+			deviceTypeNiceName = 'Code Switch'
+		elif deviceType == 'Bell':
+			deviceTypeNiceName = 'Bell'
+
+		content = content.replace("#TYPE#", deviceType)
+		content = content.replace("#TYPENICENAME#", deviceTypeNiceName)
+
+		return Web.instance.header() + content + Web.instance.footer()
+
 	@route('/devices/save', method = 'POST')
 	def device_save():
-		Web.instance.engine.deviceParser.addDevice(request.forms.name, request.forms.model, request.forms.type, request.forms.remote_control_code, request.forms.unit_code, request.forms.sunrise, request.forms.sunset)
+		if request.forms.action_type == 'add':
+			Web.instance.engine.deviceParser.addDevice(request.forms.name, request.forms.model, request.forms.type, request.forms.remote_control_code, request.forms.unit_code, request.forms.sunrise, request.forms.sunset)
+		else:
+			# update the information
+			Web.instance.engine.deviceParser.editDevice(request.forms.id, request.forms.name, request.forms.model, request.forms.type, request.forms.remote_control_code, request.forms.unit_code, request.forms.sunrise, request.forms.sunset)
+
 		Web.instance.statusMessage = '<div class="success">Successfully added a device with name ' + request.forms.name + '.</div>'
 
 		# reload all configuration
@@ -130,6 +191,55 @@ class Web:
 		Web.instance.engine.load()
 
 		redirect('/devices')
+
+	# =========================================================================================
+	#
+	#  Schema routes
+	#
+	# =========================================================================================
+
+	@route('/schemas')
+	def schemas():
+		content = open(Web.instance.webdir + '/schemas.html', 'r').read()
+
+		# Status messages
+		content = content.replace('#STATUSMESSAGE#', Web.instance.statusMessage)
+		Web.instance.statusMessage = ''
+
+		schemas = ''
+		for schema in Web.instance.engine.schemas:
+			devices = '<tr><td colspan="7" style="background-color: #f9f9f9;"><small><strong>DEVICES</strong></small></td></tr>'
+
+			if schema.getPower() == 'on':
+				powerType = 'Turn on'
+			else:
+				powerType = 'Turn off'
+
+			deviceList = schema.getDevices().split(',')
+			nod = len(deviceList)
+
+			for d in deviceList:
+				device = Web.instance.engine.deviceParser.findDevice(int(d))
+
+				if device is None:
+					continue
+
+				devices += '<tr><td colspan="7" style="background-color: #f9f9f9; padding-left: 30px;"><small><div style="float: left;"><a href="/devices/edit/' + str(device.getId()) + '">' + device.getName() + '</a></div><div style="float: left; margin-left: 40px;">' + device.getType() + '</div></small></td>'
+
+			devices += '<tr><td colspan="7">&nbsp;</td></tr>'
+
+			schemas += '<tr><td><input type="checkbox" name="schema_' + str(schema.getId()) + '" value="' + str(schema.getId()) + '" /></td><td><a href="/schemas/edit/' + str(schema.getId()) + '">' + schema.getName() + '</a></td><td>' + powerType + '</td><td style="text-align: center;">' + str(nod) + '</td><td>' + schema.getTime() + '</td><td>' + schema.getDaysString() + '</td><td>' + schema.getCondition() + '</td></tr>'
+			schemas += devices
+
+		content = content.replace('#SCHEMAS#', schemas)
+
+		return Web.instance.header() + content + Web.instance.footer()
+
+	# =========================================================================================
+	#
+	#  Misc routes
+	#
+	# =========================================================================================
 
 	@route('/power/on/:id')
 	def powerOn(id):
@@ -166,6 +276,12 @@ class Web:
 			Web.instance.statusMessage = '<div class="error">No device with id ' + str(id) + ' was found in Telldus.</div>'
 
 		redirect('/devices')
+
+	# =========================================================================================
+	#
+	#  Helper functions
+	#
+	# =========================================================================================
 
 	def header(self):
 		content = '\
