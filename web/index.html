@@ -1,5 +1,12 @@
 #STATUSMESSAGE#
 
+<script type="text/javascript">
+function loadLog() {
+	$("#log").load('/service/log')
+	$("#log").fadeIn('fast')
+}
+</script>
+
 <div class="info" style="width: 400px;">
 	<div class="info-title" style="width: 380px;">Your devices</div>
 	<table cellspacing="0" cellpadding="0" width="100%">
@@ -34,3 +41,14 @@
 		#DATASOURCES#
 	</table>
 </div>
+
+<div style="width: 100%; margin-top: 20px; float: left; border-top: 1px solid #ccc; padding-top: 20px;">
+	Administration:<br />
+	<input type="button" name="reloadconfig" value="Reload Configuration" onclick="document.location = '/service/reload';" />
+	<input type="button" name="viewlog" value="View Log" onclick="loadLog()" />
+	<input type="button" name="stopservice" value="Stop Service" onclick="if (confirm('Are you sure you want to stop Lightswitch?')) { document.location='/service/stop'; }" style="float: right;" />
+</div>
+
+<pre><div id="log" style="width: 100%; float: left; margin-top: 10px; height: 400px; overflow: auto; display: hidden;">
+
+</div></pre>

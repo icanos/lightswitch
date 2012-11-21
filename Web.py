@@ -64,6 +64,26 @@ class Web:
 
 		return Web.instance.header() + content + Web.instance.footer()
 
+	@route('/service/stop')
+	def service_stop():
+		# Stopping the service and exiting the application
+		Web.instance.engine.running = False
+		Web.instance.statusMessage = '<div class="success">Successfully shutdown the system.</div>'
+
+		redirect('/index')
+
+	@route('/service/reload')
+	def service_reload():
+		Web.instance.engine.load()
+		Web.instance.statusMessage = '<div class="information">Reloaded system configuration.</div>'
+
+		redirect('/index')
+
+	@route('/service/log')
+	def service_log():
+		content = open(Settings.loggingPath, 'r').read()
+		return '<pre>' + content + '</pre>'
+
 	@route('/devices')
 	def devices():
 		content = open(Web.instance.webdir + '/devices.html', 'r').read()
@@ -157,6 +177,7 @@ class Web:
     <title>lightswitch</title>\
     <link rel="stylesheet" href="/web/style.css" type="text/css" />\
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open%20Sans" />\
+    <script type="text/javascript" src="/web/jquery-1.8.3.min.js"></script>\
     </head>\
     <body>\
     <div id="wrapper"><div id="header"></div><div id="menu"><ul><li><a href="/index">Home</a></li><li><a href="/devices">Devices</a></li><li><a href="/schemas">Schemas</a></li><li><a href="/datasources">Data Sources</a></li><li><a href="/power">Power</a></li></ul></div><div id="content">'

@@ -11,6 +11,9 @@ from Web import Web
 from datetime import datetime
 
 class Engine:
+	VERSION = '0.0.1'
+	running = True
+
 	def __init__(self, logLevel, overwriteTelldus):
 		self.schemas = []
 		self.devices = []
@@ -65,11 +68,11 @@ class Engine:
 	def run(self):
 		self.logger.info('running on %s platform', platform.system())
 
-		self.logger.info('running application')
+		self.logger.info('running application version ' + self.VERSION)
 
 		# lightswitch main loop
 		try:
-			while True:
+			while self.running:
 				for schema in self.schemas:
 					startDate = self.schemaParser.getStartDate(schema)
 					now = datetime.today().replace(second=0, microsecond=0)
