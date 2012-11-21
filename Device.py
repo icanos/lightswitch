@@ -47,6 +47,13 @@ class Devices:
 
 		return None
 
+	def findDeviceByTelldusId(self, id):
+		for device in self.devices:
+			if device.getTelldusId() == id:
+				return device
+
+		return None
+
 class Device:
 	def __init__(self, id, tid, telldus):
 		self.id = int(id)
@@ -58,6 +65,7 @@ class Device:
 		self.unit = ""
 		self.sunrise = False
 		self.sunset = False
+		self.status = "Unknown"
 
 		self.telldus = telldus
 
@@ -81,6 +89,20 @@ class Device:
 
 	def getUnit(self):
 		return self.unit
+
+	def getType(self):
+		if self.model == 'selflearning-switch:nexa':
+			return "Self-Learning Nexa Switch"
+
+		# TODO: Add more devices
+
+		return "Unknown"
+
+	def getStatus(self):
+		return self.status
+
+	def setStatus(self, status):
+		self.status = status
 
 	def setName(self, name):		
 		self.name = name

@@ -1,0 +1,37 @@
+
+<script type="text/javascript">
+function handleAllRows()
+{
+	var checkAll = document.getElementById('checkall');
+
+	for (i=0; i<document.deviceForm.elements.length; i++) { 
+		el = document.deviceForm.elements[i];
+		if (el.type == "checkbox" && el.name != 'checkall') {
+			el.checked = checkAll.checked;
+		} 
+	}
+}
+</script>
+
+<form name="deviceForm">
+
+#STATUSMESSAGE#
+
+<input type="button" name="add_device" value="Add new device" class="submenu-button" />
+
+<div class="info" style="width: 100%;">
+	<div class="info-title" style="width: 98.8%;">Your devices</div>
+	<table cellspacing="0" cellpadding="0" width="100%">
+		<tr>
+			<th><input type="checkbox" name="checkall" id="checkall" value="true" onclick="handleAllRows();" /></th>
+			<th>Device</th>
+			<th>Status</th>
+			<th>Type</th>
+			<th>Action</th>
+		</tr>
+		#DEVICES#
+	</table>
+</div>
+
+<div style="margin-top: 10px; margin-left: 10px; float: left;">With selected: <input type="button" name="deleteBtn" value="Delete" /></div>
+</form>

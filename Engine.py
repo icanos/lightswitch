@@ -101,7 +101,7 @@ class Engine:
 		sys.exit(3)
 
 	def startWebService(self):
-		self.webServer = Web()
+		self.webServer = Web(self.telldus, self.schemas, self.devices, self.datasources)
 
 	def startUp(self):
 		power = {}
@@ -136,12 +136,15 @@ class Engine:
 				self.logger.info('turning on device')
 				self.telldus.turnOn(dev.getTelldusId())
 				self.telldus.turnOn(dev.getTelldusId())
+				dev.setStatus('On')
 			elif power[device] == 'off':
 				self.logger.info('turning off device')
 				self.telldus.turnOff(dev.getTelldusId())
+				dev.setStatus('Off')
 			elif power[device][0:3] == 'dim':
 				self.logger.info('dimming device to level %d', int(power[device][4:]))
 				self.telldus.dim(dev.getTelldusId(), int(power[device][4:]))
+				dev.setStatus('On')
 				#self.telldus.dim(dev.getTelldusId(), int((float(power[device][4:]) / float(100)) * float(254)))
 
 	def execute(self, schema):
@@ -158,13 +161,16 @@ class Engine:
 				self.telldus.turnOn(device.getTelldusId())
 				time.sleep(1)
 				self.telldus.turnOn(device.getTelldusId())
+				device.setStatus('On')
 			elif schema.getPower() == 'dim':
 				self.logger.info('dimming device to level %d', schema.getProcentualLevel())
 				self.telldus.dim(device.getTelldusId(), schema.getLevel())
+				device.setStatus('On')
 			else:
 				self.logger.info('turning off device')
 				self.telldus.turnOff(device.getTelldusId())
 				self.telldus.turnOff(device.getTelldusId())
+				device.setStatus('Off')
 
 			#time.sleep(1)
 

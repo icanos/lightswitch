@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 import ConfigParser, os, sys
-import logging, json, platform
+import logging, json, platform, time
 from Settings import Settings
 from urllib import urlopen
+from datetime import datetime
 
 class DataSources:
 	def __init__(self, logLevel):
@@ -63,6 +64,7 @@ class DataSource:
 		self.first_run = True
 		self.current_value = -10000.0
 		self.previous_value = -10000.0
+		self.last_updated = None
 
 		logging.basicConfig(level=logLevel)
 		fileLog = logging.FileHandler(Settings.loggingPath)
@@ -90,6 +92,8 @@ class DataSource:
 				
 			if self.previous_value != self.current_value:
 				self.logger.debug('new value retrieved %s (old: %s)', self.current_value, self.previous_value)
+
+			self.last_updated = datetime.today().replace(second=0, microsecond=0)
 
 			# todo: implement bad value handling
 
@@ -124,6 +128,12 @@ class DataSource:
 
 	def getId(self):
 		return self.id
+
+	def getLastUpdated(self):
+		if self.last_updated is None:
+			return ''
+
+		return str(self.last_updated)
 
 	def getUrl(self):
 		return self.url

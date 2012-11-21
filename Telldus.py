@@ -126,7 +126,7 @@ class Telldus:
 		return s
 
 	def turnOn(self, id):
-		self.logger.debug('sending turnOn() to device %d', id)
+		self.logger.debug('sending turnOn() to device %d', int(id))
 		retval = self.tdlib.tdTurnOn(id)
 
 		if retval is not 0:
