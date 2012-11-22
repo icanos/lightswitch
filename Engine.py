@@ -149,7 +149,8 @@ class Engine:
 			elif power[device][0:3] == 'dim':
 				self.logger.info('dimming device to level %d', int(power[device][4:]))
 				self.telldus.dim(dev.getTelldusId(), int(power[device][4:]))
-				dev.setStatus('On')
+				dev.setStatus('Dimmed')
+				#dev.setStatus('On')
 				#self.telldus.dim(dev.getTelldusId(), int((float(power[device][4:]) / float(100)) * float(254)))
 
 	def execute(self, schema):
@@ -170,7 +171,7 @@ class Engine:
 			elif schema.getPower() == 'dim':
 				self.logger.info('dimming device to level %d', schema.getProcentualLevel())
 				self.telldus.dim(device.getTelldusId(), schema.getLevel())
-				device.setStatus('On')
+				device.setStatus('Dimmed ' + schema.getProcentualLevel() + '%')
 			else:
 				self.logger.info('turning off device')
 				self.telldus.turnOff(device.getTelldusId())

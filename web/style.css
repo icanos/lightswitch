@@ -11,6 +11,13 @@ a:hover {
 	text-decoration: underline;
 }
 
+#footer {
+	width: 500px;
+	margin: 0 auto;
+	text-align: center;
+	color: #aaa;
+}
+
 #wrapper {
 	width: 95%;
 	margin: 0 auto;

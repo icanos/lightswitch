@@ -426,13 +426,14 @@ class Web:
     <script type="text/javascript" src="/web/jquery-1.8.3.min.js"></script>\
     </head>\
     <body>\
-    <div id="wrapper"><div id="header"></div><div id="menu"><ul><li><a href="/index">Home</a></li><li><a href="/devices">Devices</a></li><li><a href="/schemas">Schemas</a></li><li><a href="/datasources">Data Sources</a></li><li><a href="/power">Power</a></li></ul></div><div id="content">'
+    <div id="wrapper"><div id="header"></div><div id="menu"><ul><li><a href="/index">Home</a></li><li><a href="/devices">Devices</a></li><li><a href="/schemas">Schemas</a></li><li><a href="/datasources">Data Sources</a></li></ul></div><div id="content">'
 
 		return content
 
 	def footer(self):
 		content = '\
 		</div></div>\
+		<div id="footer"><small>Powered by Lightswitch v. ' + Web.instance.engine.VERSION + '<br />developed by Marcus Westin</small></div>\
 	</body>\
 </html>'
 
