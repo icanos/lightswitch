@@ -8,9 +8,20 @@
 
 <h2 style="margin-top: 0; padding-top: 0;">Edit device '#NAME#'</h2>
 
+<script type="text/javascript">
+function learnDevice()
+{
+	if (confirm('Put the device in learning mode before clicking \'OK\' on this dialog.'))
+	{
+		var deviceId = document.getElementById('deviceId');
+		$("#learnStatus").load('/devices/learn/' + deviceId.value + '?n=' + Math.random());
+	}
+}
+</script>
+
 <form action="/devices/save" method="post" name="device-form">
 <input type="hidden" name="action_type" value="edit" />
-<input type="hidden" name="id" value="#ID#" />
+<input type="hidden" name="id" id="deviceId" value="#ID#" />
 <table id="add-form" cellspacing="0" cellpadding="0" width="30%">
 	<tr>
 		<th>&nbsp;</th>
@@ -89,6 +100,18 @@
 	<tr>
 		<td style="width: 150px; text-align: right; padding-right: 20px;">Sunset</td>
 		<td><input type="checkbox" name="sunset" value="on" #CHECKEDSUNSET# style="border: 0; width: auto;" /> Turn on</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td style="border: 1px solid #eee; background: #f9f9f9; border-right: 0; width: 150px; text-align: right; padding: 6px; padding-right: 20px;" valign="top">Learn Device</td>
+		<td style="border: 1px solid #eee; background: #f9f9f9; border-left: 0; padding: 6px;"><input type="button" name="learndevice" value="Send Learn Command" onclick="learnDevice();" /><br />
+
+			<div id="learnStatus" style="margin-top: 5px;">Status: Not sent</div>
+
+		</td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>

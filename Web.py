@@ -28,14 +28,11 @@ class Web:
 
 		run(host='localhost', port=Settings.webPort)
 
-	@route('/hello/:name')
-	def hello(name):
-		return '<h1>Hello %s!</h1>' % name.title()
-
 	@route('/web/:file')
 	def web(file):
 		return static_file(file, root=Web.instance.webdir)
 
+	@route('/')
 	@route('/index')
 	def index():
 		content = open(Web.instance.webdir + '/index.html', 'r').read()
@@ -191,6 +188,20 @@ class Web:
 		Web.instance.engine.load()
 
 		redirect('/devices')
+
+	@route('/devices/learn/:id')
+	def device_learn(id):
+		try:
+			numericId = int(id)
+
+			if Web.instance.engine.telldus.learn(numericId) is not 0:
+				return 'Status: Telldus device not found'
+			else:
+				return 'Status: Learn command sent'
+		except ValueError:
+			return 'Status: Unknown device id'
+
+		return 'Status: Unknown'
 
 	# =========================================================================================
 	#

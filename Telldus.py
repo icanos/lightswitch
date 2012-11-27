@@ -191,7 +191,7 @@ class Telldus:
 			self.logger.error('error while trying to learn device: %s', s)
 			self.tdlib.tdReleaseString(vp)
 
-		return retval
+		return int(retval)
 
 	def getStatus(self, id):
 		state = self.tdlib.tdLastSentCommand(id)
