@@ -8,6 +8,7 @@ from Device import Devices, Device
 from DataSource import DataSources, DataSource
 from Telldus import Telldus
 from Web import Web
+from Sun import Sun
 from datetime import datetime
 
 class Engine:
@@ -20,6 +21,7 @@ class Engine:
 		self.executedDates = {}
 		self.executedDates['start'] = []
 		self.executedDates['end'] = []
+		self.sunDates = []
 		self.logLevel = logLevel
 		self.overwriteTelldus = overwriteTelldus
 
@@ -27,6 +29,7 @@ class Engine:
 		self.deviceParser = Devices(logLevel)
 		self.schemaParser = Schemas(logLevel)
 		self.dataSourceParser = DataSources(logLevel)
+		self.sun = Sun()
 		self.webServer = None
 		self.webThread = None
 
@@ -63,6 +66,13 @@ class Engine:
 				self.logger.info('replacing devices in telldus with devices from lightswitch.')
 				self.updateTelldusWithDevices()
 
+		if Settings.enableExperimenal:
+			self.logger.info(' ')
+			self.logger.info(' ')
+			self.logger.info('         RUNNING EXPERIMENTAL FEATURES')
+			self.logger.info(' ')
+			self.logger.info(' ')
+
 		self.startUp()
 
 	def run(self):
@@ -73,10 +83,26 @@ class Engine:
 		# lightswitch main loop
 		try:
 			while self.running:
+				now = datetime.today().replace(second=0, microsecond=0)
+				weekday = datetime.today().weekday()
+
+				if Settings.enableExperimenal:
+					for device in self.devices:
+						if device.getSunrise() == 'on' and now not in self.sunDates and now == self.sun.sunrise():
+							self.logger.info('turning off device %s because of sunrise', device.getName())
+							self.telldus.turnOff(device.getTelldusId())
+							device.setStatus('Off')
+
+							self.sunDates.append(now)
+						elif device.getSunset() == 'on' and now not in self.sunDates and now == self.sun.sunset():
+							self.logger.info('turning on device %s because of sunset', device.getName())
+							self.telldus.turnOn(device.getTelldusId())
+							device.setStatus('On')
+
+							self.sunDates.append(now)
+
 				for schema in self.schemas:
 					startDate = self.schemaParser.getStartDate(schema)
-					now = datetime.today().replace(second=0, microsecond=0)
-					weekday = datetime.today().weekday()
 
 					# check if its a start of a schedule
 					if (startDate is not None and\
@@ -95,6 +121,12 @@ class Engine:
 					self.executedDates['start'].append(now)
 				else:
 					self.executedDates['start'] = [now]
+
+				if len(self.executedDates) > 100:
+					self.executedDates = {}
+
+				if len(self.sunDates) > 100:
+					self.sunDates = []
 
 				time.sleep(1)
 		except KeyboardInterrupt:
