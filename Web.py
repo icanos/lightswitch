@@ -14,10 +14,6 @@ class Web:
 		self.webdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + '/web'
 
 		self.engine = engine
-		#self.schemas = schemas
-		#self.devices = devices
-		#self.datasources = datasources
-		#self.telldus = telldus
 		self.deviceParser = deviceParser
 		self.schemaParser = schemaParser
 
@@ -26,7 +22,7 @@ class Web:
 		# set singleton instance
 		Web.instance = self
 
-		run(host='localhost', port=Settings.webPort)
+		run(host='0.0.0.0', port=Settings.webPort)
 
 	@route('/web/:file')
 	def web(file):
