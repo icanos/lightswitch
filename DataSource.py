@@ -81,7 +81,6 @@ class DataSource:
 
 			# execute the fetching stuff
 			content = urlopen(self.url).read()
-			self.first_run = False
 			
 			self.previous_value = self.current_value
 
@@ -95,9 +94,19 @@ class DataSource:
 			if self.previous_value != self.current_value:
 				self.logger.debug('new value retrieved %s (old: %s)', self.current_value, self.previous_value)
 
-			self.last_updated = datetime.today().replace(second=0, microsecond=0)
+			# bad value handling
+			if self.bad_response_use_previous == 'on':
+				diff = self.current_value - self.previous_value
+				if diff < 0:
+					diff = diff * -1
 
-			# todo: implement bad value handling
+				procentual_change = (float(diff) / float(self.current_value)) * 100
+
+				if not self.first_run and (procentual_change > 50):
+					self.logger.error('bad value (50% diff) from data source (using old value)')
+
+			self.first_run = False
+			self.last_updated = datetime.today().replace(second=0, microsecond=0)
 
 			# reset the seconds counter
 			self.seconds_elapsed = 0
