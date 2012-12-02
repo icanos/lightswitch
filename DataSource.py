@@ -95,7 +95,7 @@ class DataSource:
 				self.logger.debug('new value retrieved %s (old: %s)', self.current_value, self.previous_value)
 
 			# bad value handling
-			if self.bad_response_use_previous == 'on':
+			if self.bad_response_use_previous == 'on' and isinstance(self.current_value, int) and isinstance(self.previous_value, int):
 				diff = self.current_value - self.previous_value
 				if diff < 0:
 					diff = diff * -1
