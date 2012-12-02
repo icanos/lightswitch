@@ -81,7 +81,14 @@ class Telldus:
 				raise Exception('Telldus Core was not found, are you sure it is installed?')
 		else:
 			from ctypes import cdll
-			self.tdlib = cdll.LoadLibrary('/usr/local/lib/libtelldus-core.so')
+
+			try:
+				self.tdlib = cdll.LoadLibrary('/usr/local/lib/libtelldus-core.so')
+			except OSError:
+				try:
+					self.tdlib = cdll.LoadLibrary('/usr/lib/libtelldus-core.so')
+				except OSError:
+					raise Exception('Telldus Core was not found, are you sure it is installed?')
 
 		if self.tdlib is None:
 			raise Exception('No Telldus Core library was found')
